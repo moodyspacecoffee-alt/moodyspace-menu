@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Moody Space — Lihat Menu</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Silkscreen:wght@400;700&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --green: #11754D;
+    --green-2: #0E5E3E;
+    --green-deep: #093824;
+    --green-light: #1F9963;
+    --cream: #F9F9CF;
+    --cream-soft: #FDFBEA;
+    --ink: #123424;
+    --ink-soft: #4C6355;
+    --line: rgba(17,117,77,0.16);
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: #DCE4DA;
+    font-family:'DM Sans', sans-serif;
+    color: var(--ink);
+    min-height: 100vh;
+    display:flex;
+    justify-content:center;
+    padding: 22px 10px;
+  }
+
+  .pixel-hero{ font-family:'Press Start 2P', monospace; }
+  .pixel{ font-family:'Silkscreen', monospace; }
+
+  .phone{
+    width: 100%;
+    max-width: 400px;
+    background: var(--cream);
+    border-radius: 32px;
+    overflow:hidden;
+    box-shadow: 0 20px 50px rgba(9,56,36,0.28);
+    display:flex;
+    flex-direction:column;
+    height: 840px;
+    position:relative;
+  }
+
+  .screen{
+    flex:1;
+    overflow-y:auto;
+    padding: 20px 18px 12px;
+    scrollbar-width:none;
+  }
+  .screen::-webkit-scrollbar{ display:none; }
+
+  .view{ display:none; }
+  .view.active{ display:block; animation: fadeIn .35s ease; }
+  @keyframes fadeIn{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+
+  .brand-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom: 16px;
+  }
+  .brand-row .brand{
+    display:flex; align-items:center; gap:10px;
+  }
+  .brand-badge{
+    width:42px; height:42px;
+    flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .brand-badge img{ width:100%; height:100%; object-fit:contain; }
+  .brand-row .brand-text{
+    font-size:13px;
+    font-weight:700;
+    line-height:1.3;
+  }
+  .brand-row .brand-text span{
+    display:block;
+    font-family:'DM Sans', sans-serif;
+    font-weight:600;
+    font-size:9px;
+    letter-spacing:2px;
+    color: var(--green-2);
+    text-transform:uppercase;
+    margin-top:3px;
+  }
+  .view-only-tag{
+    font-family:'DM Sans', sans-serif;
+    font-size:9.5px;
+    font-weight:700;
+    color: var(--green);
+    background: var(--cream-soft);
+    border: 1.5px solid var(--green);
+    padding: 5px 10px;
+    border-radius: 999px;
+    letter-spacing: 0.4px;
+  }
+
+  .mood-card{
+    background: var(--green);
+    border-radius: 26px;
+    padding: 22px 20px 20px;
+    position:relative;
+    overflow:hidden;
+    color: var(--cream);
+    margin-bottom: 22px;
+  }
+  .mood-card .blob{
+    position:absolute;
+    border-radius:50%;
+    z-index:0;
+  }
+  .mood-card .blob.b1{ width:96px; height:96px; background: var(--green-light); top:-30px; right:-20px; }
+  .mood-card .blob.b2{ width:64px; height:64px; background: var(--cream); top:18px; right:36px; opacity:0.18; }
+  .mood-card .content{ position:relative; z-index:1; }
+  .bell{
+    width:34px; height:34px;
+    border-radius:10px;
+    background: rgba(249,249,207,0.14);
+    display:flex; align-items:center; justify-content:center;
+    position:relative;
+    margin-bottom:14px;
+  }
+  .bell .dot{
+    position:absolute; top:-3px; right:-3px;
+    width:14px; height:14px;
+    background:#D9534F;
+    border-radius:50%;
+    font-size:8px;
+    color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-weight:700;
+  }
+  .mood-card h1{
+    font-size: 15px;
+    line-height:1.6;
+    font-weight:400;
+    margin: 0 0 10px;
+    letter-spacing: 0.5px;
+    word-spacing: -0.4em;
+  }
+  .mood-card p{
+    font-family:'DM Sans', sans-serif;
+    font-size:12.5px;
+    line-height:1.55;
+    color: rgba(249,249,207,0.82);
+    margin: 0 0 16px;
+    max-width: 94%;
+  }
+  .mood-chips{
+    display:flex;
+    gap:8px;
+    overflow-x:auto;
+    padding-bottom:2px;
+    scrollbar-width:none;
+    cursor:grab;
+    user-select:none;
+  }
+  .mood-chips::-webkit-scrollbar{ display:none; }
+  .mood-chips.dragging{ cursor:grabbing; }
+  .chip{
+    flex-shrink:0;
+    background: rgba(249,249,207,0.12);
+    border: 1px solid rgba(249,249,207,0.3);
+    color: var(--cream);
+    font-family:'DM Sans', sans-serif;
+    font-size:11.5px;
+    font-weight:600;
+    padding:7px 12px;
+    border-radius:999px;
+    cursor:pointer;
+    white-space:nowrap;
+    transition: all .2s ease;
+  }
+  .chip.active{
+    background: var(--cream);
+    border-color: var(--cream);
+    color: var(--green-deep);
+  }
+  .mood-suggest{
+    margin-top:12px;
+    font-family:'DM Sans', sans-serif;
+    font-size:12px;
+    font-weight:700;
+    color: var(--cream);
+    min-height:16px;
+  }
+
+  .sec-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin: 6px 0 14px;
+  }
+  .sec-head h2{
+    font-size:12.5px;
+    font-weight:400;
+    margin:0;
+    letter-spacing: 0.5px;
+  }
+  .sec-head .see-all{
+    font-family:'DM Sans', sans-serif;
+    font-size:11px;
+    font-weight:700;
+    color: var(--green);
+    cursor:pointer;
+  }
+
+  .promo-strip{
+    display:flex;
+    gap:12px;
+    overflow-x:auto;
+    padding-bottom:6px;
+    margin-bottom: 26px;
+    scrollbar-width:none;
+    cursor:grab;
+    user-select:none;
+  }
+  .promo-strip::-webkit-scrollbar{ display:none; }
+  .promo-strip.dragging{ cursor:grabbing; }
+  .promo-strip.dragging .promo-card{ pointer-events:none; }
+  .promo-card{
+    flex-shrink:0;
+    width: 210px;
+    background: var(--green-2);
+    border-radius:18px;
+    padding:14px 15px;
+    color: var(--cream);
+    position:relative;
+    border: 1px dashed rgba(249,249,207,0.3);
+    cursor:pointer;
+  }
+  .promo-card .tag{
+    display:inline-block;
+    background: var(--cream);
+    color: var(--green-deep);
+    font-family:'DM Sans', sans-serif;
+    font-size:9.5px;
+    font-weight:800;
+    letter-spacing:0.5px;
+    text-transform:uppercase;
+    padding:3px 8px;
+    border-radius:999px;
+    margin-bottom:10px;
+  }
+  .promo-card h3{
+    font-size:11.5px;
+    line-height:1.6;
+    font-weight:400;
+    margin:0 0 7px;
+  }
+  .promo-card p{
+    font-family:'DM Sans', sans-serif;
+    font-size:11px;
+    line-height:1.5;
+    margin:0;
+    color: rgba(249,249,207,0.78);
+  }
+
+  .item-card{
+    display:flex;
+    background: var(--green);
+    border-radius: 20px;
+    margin-bottom: 14px;
+    overflow:hidden;
+    min-height: 100px;
+  }
+  .item-media{
+    width: 100px;
+    flex-shrink:0;
+    background: var(--cream-soft);
+    border-radius: 20px;
+    margin: 8px 0 8px 8px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .item-media svg{ width:58px; height:58px; }
+  .item-body{
+    flex:1;
+    padding: 13px 14px 12px 14px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    gap: 8px;
+    color: var(--cream);
+    position:relative;
+  }
+  .item-body .name{
+    font-family:'DM Sans', sans-serif;
+    font-weight:700;
+    font-size:13.5px;
+    line-height:1.3;
+  }
+  .item-body .price{
+    font-family:'DM Mono', monospace;
+    font-size:12.5px;
+    color: var(--cream);
+    font-weight:500;
+    opacity: 0.92;
+  }
+  .item-body .price-dual{
+    display:flex;
+    gap:14px;
+    flex-wrap:wrap;
+  }
+  .item-body .price-dual > span{
+    font-family:'DM Mono', monospace;
+    font-size:12.5px;
+    color: var(--cream);
+    font-weight:500;
+    opacity:0.95;
+  }
+  .item-body .price-dual .lbl{
+    display:block;
+    font-family:'DM Sans', sans-serif;
+    font-size:9px;
+    font-weight:700;
+    letter-spacing:0.5px;
+    text-transform:uppercase;
+    color: rgba(249,249,207,0.65);
+    margin-bottom:1px;
+  }
+
+  .fav-card{ min-height: 120px; }
+  .fav-card .item-body{ justify-content:flex-start; gap:6px; }
+  .fav-card .name{ display:flex; align-items:center; gap:7px; flex-wrap:wrap; }
+  .new-badge{
+    font-family:'DM Sans', sans-serif;
+    font-size:8.5px;
+    font-weight:800;
+    letter-spacing:0.5px;
+    color: var(--green-deep);
+    background: var(--cream);
+    padding: 2px 7px;
+    border-radius: 999px;
+  }
+  .fav-desc{
+    font-family:'DM Sans', sans-serif;
+    font-size:11px;
+    line-height:1.45;
+    color: rgba(249,249,207,0.78);
+  }
+
+  .subtabs{
+    display:flex;
+    gap:8px;
+    overflow-x:auto;
+    margin-bottom:16px;
+    scrollbar-width:none;
+    cursor:grab;
+    user-select:none;
+  }
+  .subtabs::-webkit-scrollbar{ display:none; }
+  .subtabs.dragging{ cursor:grabbing; }
+  .subtab{
+    flex-shrink:0;
+    font-size:10.5px;
+    padding:9px 14px;
+    border-radius:999px;
+    border:1.5px solid var(--green);
+    color: var(--ink);
+    cursor:pointer;
+  }
+  .subtab.active{
+    background: var(--green);
+    color: var(--cream);
+  }
+
+  .view-title{
+    font-size:16px;
+    line-height:1.5;
+    font-weight:400;
+    margin: 4px 0 18px;
+  }
+
+  .promo-full{
+    background: var(--green);
+    border-radius:20px;
+    padding:16px 16px 15px;
+    color: var(--cream);
+    margin-bottom:14px;
+    position:relative;
+    border: 1px dashed rgba(249,249,207,0.28);
+  }
+  .promo-full .tag{
+    display:inline-block;
+    background: var(--cream);
+    color: var(--green-deep);
+    font-family:'DM Sans', sans-serif;
+    font-size:9.5px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+    padding:3px 9px;
+    border-radius:999px;
+    margin-bottom:10px;
+  }
+  .promo-full h3{
+    font-size:13px;
+    line-height:1.6;
+    font-weight:400;
+    margin:0 0 8px;
+  }
+  .promo-full p{
+    font-family:'DM Sans', sans-serif;
+    font-size:12px;
+    line-height:1.55;
+    color: rgba(249,249,207,0.82);
+    margin:0 0 8px;
+  }
+  .promo-full .period{
+    font-family:'DM Sans', sans-serif;
+    font-size:10.5px;
+    color: var(--cream);
+    font-weight:700;
+  }
+
+  .addon-block{
+    margin-top: 6px;
+    background: var(--green-2);
+    border-radius: 18px;
+    padding: 16px 18px;
+  }
+  .addon-block h3{
+    font-size: 10.5px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--cream);
+    margin: 0 0 12px;
+    font-weight:400;
+  }
+  .addon-row{
+    display:flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(249,249,207,0.12);
+    color: var(--cream);
+    font-family:'DM Sans', sans-serif;
+    font-size: 13px;
+  }
+  .addon-row:last-child{ border-bottom:none; }
+  .addon-row span:last-child{
+    font-family:'DM Mono', monospace;
+    color: var(--cream);
+  }
+
+  .bottom-nav{
+    display:flex;
+    background: var(--green-deep);
+    padding: 10px 8px calc(10px + env(safe-area-inset-bottom));
+    flex-shrink:0;
+  }
+  .nav-btn{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:4px;
+    color: rgba(249,249,207,0.45);
+    cursor:pointer;
+    font-family:'DM Sans', sans-serif;
+    font-size:10px;
+    font-weight:700;
+    padding: 4px 0;
+    transition: color .2s ease;
+  }
+  .nav-btn svg{ width:20px; height:20px; }
+  .nav-btn.active{ color: var(--cream); }
+
+  footer.note{
+    text-align:center;
+    font-family:'DM Sans', sans-serif;
+    font-size:10px;
+    color: var(--ink-soft);
+    margin-top:14px;
+    line-height:1.6;
+  }
+  /* ============================================================
+     REFRESH TAMPILAN — Minuman, Makanan, Promo
+     (di-scope per halaman biar Home & Favorit tetap sama)
+     ============================================================ */
+
+  /* Judul halaman + aksen pixel */
+  #view-minuman .view-title,
+  #view-makanan .view-title,
+  #view-promo .view-title{
+    position:relative;
+    display:inline-block;
+    padding-bottom:11px;
+    margin: 4px 0 22px;
+  }
+  #view-minuman .view-title::after,
+  #view-makanan .view-title::after,
+  #view-promo .view-title::after{
+    content:"";
+    position:absolute; left:2px; bottom:0;
+    width:20px; height:5px;
+    background: var(--green-light);
+    border-radius:2px;
+    box-shadow: 26px 0 0 rgba(17,117,77,0.9), 52px 0 0 rgba(17,117,77,0.35);
+  }
+
+  /* ---- Kartu menu (Minuman & Makanan): kartu krem + harga pill ---- */
+  #view-minuman .item-card,
+  #view-makanan .item-card{
+    background: var(--cream-soft);
+    border: 1.5px solid rgba(17,117,77,0.18);
+    border-radius: 22px;
+    box-shadow: 0 6px 16px rgba(9,56,36,0.07);
+    transition: transform .18s ease, box-shadow .18s ease;
+  }
+  #view-minuman .item-card:hover,
+  #view-makanan .item-card:hover{
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(9,56,36,0.14);
+  }
+  #view-minuman .item-media,
+  #view-makanan .item-media{
+    background: linear-gradient(150deg, #EAF3EC 0%, #D3E7DB 100%);
+    border: 1px solid rgba(17,117,77,0.12);
+  }
+  #view-minuman .item-body,
+  #view-makanan .item-body{ color: var(--ink); }
+  #view-minuman .item-body .name,
+  #view-makanan .item-body .name{ color: var(--ink); font-size:14px; }
+
+  /* harga: satu pill hijau */
+  #view-minuman .item-body .price,
+  #view-makanan .item-body .price{
+    align-self:flex-start;
+    background: var(--green);
+    color: var(--cream);
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    opacity: 1;
+    box-shadow: 0 3px 8px rgba(17,117,77,0.22);
+  }
+  /* harga Hot/Iced: dua pill kecil */
+  #view-minuman .item-body .price-dual,
+  #view-makanan .item-body .price-dual{ gap:8px; }
+  #view-minuman .item-body .price-dual > span,
+  #view-makanan .item-body .price-dual > span{
+    background: var(--green);
+    color: var(--cream);
+    padding: 4px 11px 4px;
+    border-radius: 13px;
+    opacity: 1;
+    display:flex; flex-direction:column; align-items:center;
+    line-height:1.15;
+    box-shadow: 0 3px 8px rgba(17,117,77,0.2);
+  }
+  #view-minuman .item-body .price-dual .lbl,
+  #view-makanan .item-body .price-dual .lbl{
+    color: rgba(249,249,207,0.72);
+    margin-bottom:1px;
+  }
+
+  /* ---- Subtab kategori minuman ---- */
+  #view-minuman .subtab{
+    background: var(--cream-soft);
+    border:1.5px solid rgba(17,117,77,0.35);
+    color: var(--green);
+    box-shadow: 0 2px 6px rgba(9,56,36,0.05);
+    transition: all .18s ease;
+  }
+  #view-minuman .subtab.active{
+    background: var(--green);
+    color: var(--cream);
+    border-color: var(--green);
+    box-shadow: 0 5px 12px rgba(17,117,77,0.3);
+  }
+
+  /* ---- Blok Tambahan (Makanan) ---- */
+  #view-makanan .addon-block{
+    background: linear-gradient(150deg, var(--green) 0%, var(--green-2) 100%);
+    border-radius: 22px;
+    box-shadow: 0 8px 20px rgba(9,56,36,0.14);
+    margin-top: 18px;
+  }
+  #view-makanan .addon-block h3{ letter-spacing:1.5px; }
+
+  /* ---- Promo: bentuk kupon/tiket ---- */
+  #view-promo .promo-full{
+    background: linear-gradient(140deg, var(--green) 0%, var(--green-2) 55%, var(--green-deep) 100%);
+    border: none;
+    border-radius: 20px;
+    padding: 18px 20px 16px;
+    box-shadow: 0 10px 26px rgba(9,56,36,0.2);
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 16px;
+  }
+  /* dua takik di sisi kiri-kanan = efek tiket */
+  #view-promo .promo-full::before,
+  #view-promo .promo-full::after{
+    content:"";
+    position:absolute;
+    top:50%;
+    width:18px; height:18px;
+    background: var(--cream);
+    border-radius:50%;
+    transform: translateY(-50%);
+  }
+  #view-promo .promo-full::before{ left:-9px; }
+  #view-promo .promo-full::after{ right:-9px; }
+  #view-promo .promo-full .tag{
+    box-shadow: 0 2px 0 rgba(9,56,36,0.25);
+  }
+  #view-promo .promo-full .period{
+    margin-top: 13px;
+    padding-top: 11px;
+    border-top: 2px dashed rgba(249,249,207,0.38);
+  }
+  #view-promo .promo-full .period::before{ content:"🎟 "; }
+
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="screen">
+
+    <div class="view active" id="view-home">
+      <div class="brand-row">
+        <div class="brand">
+          <div class="brand-badge" style="width:60px;height:60px;"><img src="data:image/png;base64,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" alt="Moody Space"></div>
+        </div>
+        <div class="view-only-tag">#Bertamoodysini</div>
+      </div>
+
+      <div class="mood-card">
+        <div class="blob b1"></div>
+        <div class="blob b2"></div>
+        <div class="content">
+          <div class="bell">
+            🔔
+            <span class="dot">1</span>
+          </div>
+          <h1 class="pixel-hero">HALO, #PARAKAWULA</h1>
+          <p>Tiap mood ada temannya di sini. Cerita dong — hari ini lagi ngerasa gimana?</p>
+          <div class="mood-chips" id="moodChips"></div>
+          <div class="mood-suggest" id="moodSuggest"></div>
+        </div>
+      </div>
+
+      <div class="sec-head">
+        <h2 class="pixel-hero">PROMO BULAN INI</h2>
+        <span class="see-all" onclick="goto('promo')">lihat semua</span>
+      </div>
+      <div class="promo-strip" id="promoStrip"></div>
+
+      <div class="sec-head">
+        <h2 class="pixel-hero">#FAVORITEKAWULA</h2>
+      </div>
+      <div id="recommendList"></div>
+
+      <footer class="note">Menu ini cuma buat lihat-lihat ya — pemesanan tetap langsung ke kasir 🌿</footer>
+    </div>
+
+    <div class="view" id="view-minuman">
+      <div class="view-title pixel-hero">MINUMAN</div>
+      <div class="subtabs pixel" id="drinkSubtabs"></div>
+      <div id="drinkList"></div>
+    </div>
+
+    <div class="view" id="view-makanan">
+      <div class="view-title pixel-hero">MAKANAN</div>
+      <div id="mealList"></div>
+      <div class="addon-block">
+        <h3 class="pixel-hero" style="font-size:9px;">TAMBAHAN</h3>
+        <div id="addonList"></div>
+      </div>
+    </div>
+
+    <div class="view" id="view-promo">
+      <div class="view-title pixel-hero">PROMO</div>
+      <div id="promoFullList"></div>
+      <footer class="note">Pilih yang paling ngena, mampir ke kasir, mood sama hemat naik bareng 🌿</footer>
+    </div>
+
+  </div>
+
+  <nav class="bottom-nav" id="bottomNav">
+    <div class="nav-btn active" data-view="home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+      Home
+    </div>
+    <div class="nav-btn" data-view="minuman">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12l-1.5 15a2 2 0 01-2 2h-5a2 2 0 01-2-2L6 3z"/><path d="M6 8h12"/></svg>
+      Minuman
+    </div>
+    <div class="nav-btn" data-view="makanan">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+      Makanan
+    </div>
+    <div class="nav-btn" data-view="promo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12l-8 8-9-9V4h7z"/><circle cx="7.5" cy="7.5" r="1.2" fill="currentColor" stroke="none"/></svg>
+      Promo
+    </div>
+  </nav>
+</div>
+
+<script>
+const SHEET_ID = "1E6mV7LE6AM6eGnMZiQk68zHGpiaTI9YuRPNfyFfsgXA";
+function sheetUrl(name){
+  return "https://docs.google.com/spreadsheets/d/" + SHEET_ID +
+         "/gviz/tq?tqx=out:csv&sheet=" + encodeURIComponent(name);
+}
+
+/* ================= DATA CADANGAN (dipakai kalau sheet gagal dibaca) ================= */
+const FB_ESPRESSO = [
+  { name:"Americano", hot:22000, iced:23000, cream:false },
+  { name:"Perfect Storm", single:28000, cream:true },
+  { name:"Sunset Yuzu", single:28000, cream:false },
+  { name:"Berry Honey", single:28000, cream:false },
+  { name:"Moody Lifter", single:25000, cream:false },
+  { name:"Latte", hot:25000, iced:26000, cream:false },
+  { name:"Magic", hot:31000, iced:32000, cream:true },
+  { name:"Kopi Keju", single:27000, cream:true },
+  { name:"Tiramisu Cloud", single:27000, cream:true },
+  { name:"Kopi Susu Rum", single:27000, cream:false },
+  { name:"Butterscotch Sea Salt", single:28000, cream:true },
+  { name:"Caramela", single:28000, cream:true },
+];
+const FB_NONCOFFEE = [
+  { name:"Tiramisu Regal", single:27000, cream:true },
+  { name:"Strawberry Milk", single:26000, cream:false },
+  { name:"Peach Yakult", single:27000, cream:false },
+  { name:"Lychee Yakult", single:27000, cream:false },
+  { name:"Chocolate", hot:25000, iced:26000, cream:true },
+  { name:"Choco Cheese", single:27000, cream:true },
+  { name:"Choco Berry", single:28000, cream:true },
+  { name:"Red Velvet", hot:25000, iced:26000, cream:true },
+  { name:"Red Velvet Cheese", single:27000, cream:true },
+  { name:"Green Tea", hot:25000, iced:26000, cream:false },
+];
+const FB_TEA = [
+  { name:"Tea", hot:14000, iced:15000, cream:false },
+  { name:"Lemon Tea", hot:20000, iced:21000, cream:false },
+  { name:"Lychee Tea", hot:23000, iced:24000, cream:false },
+  { name:"Peach Tea", hot:23000, iced:24000, cream:false },
+  { name:"Strawberry Tea", single:24000, cream:false },
+];
+const FB_MEALS = [
+  { name:"French Fries", single:23000 }, { name:"Sistagor", single:28000 },
+  { name:"Piscok", single:25000 }, { name:"Cireng Rujak", single:23000 },
+  { name:"Dimsum", single:25000 }, { name:"Wonton Chili Oil", single:26000 },
+  { name:"Dimsum Goreng", single:26000 }, { name:"Tahu Baso", single:25000 },
+  { name:"Nasi Goreng Daun Jeruk", single:27000 }, { name:"Kari Magelangan", single:26000 },
+  { name:"Nasi Katsu Kari", single:28000 }, { name:"Nasi Garlic Butter Chicken", single:29000 },
+  { name:"Mie Chili Oil", single:25000 }, { name:"Mie Goreng / Rebus", single:15000 },
+];
+const FB_ADDONS = [
+  { name:"Espresso", price:5000 }, { name:"Cheese Cream", price:5000 },
+  { name:"Chili Oil", price:3000 }, { name:"Telur Dadar / Rebus", price:5000 },
+];
+const FB_MOODS = [
+  { emoji:"\u{1F634}", label:"Ngantuk Berat", pick:"Moody Lifter", note:"kafein ganda buat begadang kelar" },
+  { emoji:"\u{1F36C}", label:"Pengen Manis", pick:"Butterscotch Sea Salt", note:"manis gurih, pas buat mood naik" },
+  { emoji:"\u{1F327}\uFE0F", label:"Lagi Galau", pick:"Tiramisu Cloud", note:"creamy & lembut, teman ngerasa" },
+  { emoji:"\u{1F60C}", label:"Santai Aja", pick:"Lychee Tea", note:"ringan & seger, cocok buat rileks" },
+];
+const FB_PROMOS = [
+  { tag:"Bundling", title:"Bundling Berdua", short:"2 Iced Drink pilihan + French Fries, hemat sampai Rp15rb.", detail:"Pilih 2 minuman iced dari kategori Espresso Based atau Non Coffee, ditambah 1 French Fries. Total lebih hemat dibanding beli satuan.", period:"Berlaku sepanjang bulan ini" },
+  { tag:"Jam Kerja", title:"Promo Jam Kerja", short:"Diskon 10% semua Espresso Based, jam 13.00-16.00.", detail:"Khusus menu kategori Espresso Based, potongan 10% otomatis di jam-jam kerja biar semangat lanjut ngerjain tugas.", period:"Setiap hari, 13.00-16.00" },
+  { tag:"Weekend", title:"Weekend Mood Booster", short:"Beli 2 Frappuccino/Magic, gratis 1 Non Coffee reguler.", detail:"Ajak temen ke Moody Space pas weekend - beli 2 Magic atau Frappuccino favorit, dapet gratis 1 minuman Non Coffee ukuran reguler.", period:"Sabtu & Minggu" },
+];
+const FB_FAVS = [
+  { name:"Moody Lifter", desc:"Kopi susu creamy dengan beans arabica 100%.", badge:"" },
+  { name:"Butterscotch Sea Salt", desc:"Everyone's favorite, dengan sea salt foam di atasnya.", badge:"" },
+  { name:"Berry Honey", desc:"Americano with berry, buat mulai hari yang fresh!", badge:"BARU" },
+];
+
+/* ================= STATE ================= */
+let ESPRESSO=[], NONCOFFEE=[], TEA=[], DRINK_CATS=[], MEALS=[], ADDONS=[], MOODS=[], PROMOS=[], FAVORITES=[];
+
+/* ================= CSV PARSE ================= */
+function parseCSV(text){
+  const rows=[]; let row=[], field="", inQ=false, i=0;
+  while(i<text.length){
+    const c=text[i];
+    if(inQ){
+      if(c==='"'){ if(text[i+1]==='"'){field+='"';i+=2;continue;} inQ=false;i++;continue; }
+      field+=c;i++;continue;
+    } else {
+      if(c==='"'){ inQ=true;i++;continue; }
+      if(c===','){ row.push(field);field="";i++;continue; }
+      if(c==='\r'){ i++;continue; }
+      if(c==='\n'){ row.push(field);rows.push(row);row=[];field="";i++;continue; }
+      field+=c;i++;continue;
+    }
+  }
+  row.push(field); rows.push(row);
+  return rows.filter(r=> r.some(x=> String(x).trim()!==""));
+}
+function toObjects(rows){
+  if(!rows.length) return [];
+  const headers = rows[0].map(h=> String(h).trim().toLowerCase());
+  return rows.slice(1).map(r=>{
+    const o={};
+    headers.forEach((h,idx)=> o[h] = (r[idx]!==undefined ? String(r[idx]).trim() : ""));
+    return o;
+  });
+}
+function num(v){
+  if(v===undefined||v===null) return undefined;
+  const s=String(v).replace(/[^0-9.]/g,"");
+  if(s==="") return undefined;
+  const n=parseFloat(s);
+  return isNaN(n) ? undefined : Math.round(n);
+}
+function yes(v){ return String(v||"").trim().toLowerCase()==="ya"; }
+function clean(v){ const s=String(v||"").trim(); return s===""?undefined:s; }
+
+/* ================= MAP SHEET -> STATE ================= */
+function drinkFromRow(r){
+  const item = { name: r["nama"], cream: yes(r["cream"]), photo: clean(r["foto (link)"]) };
+  const single = num(r["harga tunggal"]);
+  if(single!==undefined){ item.single=single; }
+  else { item.hot=num(r["harga hot"]); item.iced=num(r["harga iced"]); }
+  return item;
+}
+function applyData(min, mak, tam, moo, pro, fav){
+  ESPRESSO=[]; NONCOFFEE=[]; TEA=[];
+  const catMap = {"espresso based":ESPRESSO, "non coffee":NONCOFFEE, "tea based":TEA};
+  min.forEach(r=>{
+    if(!r["nama"]) return;
+    const bucket = catMap[String(r["kategori"]||"").trim().toLowerCase()];
+    if(bucket) bucket.push(drinkFromRow(r));
+  });
+  MEALS = mak.filter(r=>r["nama"]).map(r=>({ name:r["nama"], single:num(r["harga"]), photo:clean(r["foto (link)"]) }));
+  ADDONS = tam.filter(r=>r["nama"]).map(r=>({ name:r["nama"], price:num(r["harga"]) }));
+  MOODS = moo.filter(r=>r["label mood"]).map(r=>({ emoji:r["emoji"], label:r["label mood"], pick:r["rekomendasi (nama menu)"], note:r["catatan"] }));
+  PROMOS = pro.filter(r=>r["judul"]).map(r=>({ tag:r["tag"], title:r["judul"], short:r["deskripsi singkat"], detail:r["deskripsi lengkap"], period:r["periode"] }));
+  const rawFav = fav.filter(r=>r["nama item"]).map(r=>({ name:r["nama item"], desc:r["deskripsi"], badge:clean(r["badge"])||null }));
+  resolveFavs(rawFav);
+  finalizeCats();
+}
+function applyFallback(){
+  ESPRESSO=FB_ESPRESSO.slice(); NONCOFFEE=FB_NONCOFFEE.slice(); TEA=FB_TEA.slice();
+  MEALS=FB_MEALS.slice(); ADDONS=FB_ADDONS.slice(); MOODS=FB_MOODS.slice(); PROMOS=FB_PROMOS.slice();
+  resolveFavs(FB_FAVS.map(f=>({name:f.name,desc:f.desc,badge:f.badge||null})));
+  finalizeCats();
+}
+function resolveFavs(raw){
+  const all=[...ESPRESSO,...NONCOFFEE,...TEA];
+  FAVORITES = raw.map(f=>({
+    item: all.find(i=>String(i.name).toLowerCase()===String(f.name).toLowerCase()) || { name:f.name },
+    desc: f.desc, badge: f.badge||null
+  }));
+}
+function finalizeCats(){
+  DRINK_CATS = [
+    { key:"espresso", label:"Espresso Based", items:ESPRESSO },
+    { key:"noncoffee", label:"Non Coffee", items:NONCOFFEE },
+    { key:"tea", label:"Tea Based", items:TEA },
+  ];
+}
+
+/* ================= FORMAT & IKON ================= */
+function rp(n){ if(n===undefined||n===null||isNaN(n)) return ""; return "Rp " + Math.round(Number(n)).toLocaleString('id-ID'); }
+
+function tintFor(name){
+  const n=(name||"").toLowerCase();
+  if(n.includes('matcha')||n.includes('green tea')) return '#3E8F5E';
+  if(n.includes('choco')) return '#0E5E3E';
+  if(n.includes('red velvet')) return '#0F6E4A';
+  if(n.includes('tiramisu')) return '#1F9963';
+  if(n.includes('caramel')||n.includes('butterscotch')||n.includes('perfect storm')) return '#2CA46C';
+  if(n.includes('strawberry')) return '#177A4F';
+  if(n.includes('peach')) return '#249A63';
+  if(n.includes('lychee')) return '#1C8557';
+  if(n.includes('yuzu')||n.includes('lemon')) return '#249A63';
+  if(n.includes('berry honey')) return '#0E5E3E';
+  if(n.includes('tea')) return '#1F9963';
+  return '#11754D';
+}
+function foodTint(name){
+  const n=(name||"").toLowerCase();
+  if(n.includes('nasi')) return '#E8E7B8';
+  if(n.includes('mie')) return '#2CA46C';
+  if(n.includes('fries')) return '#1F9963';
+  return '#177A4F';
+}
+function drinkIcon(name, cream){
+  const tint=tintFor(name);
+  return '<svg viewBox="0 0 64 64">'
+    +'<path d="M18 20h28l-3 30a5 5 0 01-5 4.5H26a5 5 0 01-5-4.5L18 20z" fill="'+tint+'" opacity="0.9"/>'
+    +'<rect x="16" y="16" width="32" height="6" rx="3" fill="#11754D" opacity="0.85"/>'
+    +(cream ? '<ellipse cx="32" cy="18" rx="12" ry="6" fill="#F9F9CF"/>' : '')
+    +'<rect x="30" y="4" width="3" height="16" rx="1.5" fill="#11754D" transform="rotate(10 32 12)"/>'
+    +'<rect x="22" y="30" width="4" height="8" rx="1" fill="#F9F9CF" opacity="0.55"/>'
+    +'<rect x="30" y="34" width="4" height="8" rx="1" fill="#F9F9CF" opacity="0.4"/></svg>';
+}
+function foodIcon(name){
+  const tint=foodTint(name);
+  return '<svg viewBox="0 0 64 64">'
+    +'<circle cx="32" cy="36" r="20" fill="#11754D" opacity="0.85"/>'
+    +'<circle cx="32" cy="34" r="14" fill="'+tint+'" opacity="0.95"/>'
+    +'<circle cx="26" cy="30" r="2.4" fill="#F9F9CF" opacity="0.7"/>'
+    +'<circle cx="36" cy="32" r="2" fill="#F9F9CF" opacity="0.7"/>'
+    +'<circle cx="31" cy="38" r="2.2" fill="#F9F9CF" opacity="0.7"/></svg>';
+}
+// Ubah link Google Drive biasa jadi link gambar langsung yang bisa dipajang
+function normalizePhoto(url){
+  const u=String(url||'').trim();
+  const m=u.match(/(?:\/d\/|[?&]id=)([a-zA-Z0-9_-]{20,})/);
+  if(m) return 'https://lh3.googleusercontent.com/d/'+m[1];
+  return u;
+}
+function mediaFor(item, kind){
+  const icon = kind==='food' ? foodIcon(item.name) : drinkIcon(item.name, item.cream);
+  if(item.photo){
+    const url = normalizePhoto(item.photo);
+    // kalau foto gagal dimuat, otomatis balik ke ikon (bukan gambar rusak)
+    return '<img src="'+url+'" alt="'+(item.name||'')+'"'
+      +' style="width:100%;height:100%;object-fit:cover;border-radius:20px;"'
+      +' onerror="this.outerHTML=this.getAttribute(\'data-fb\')"'
+      +' data-fb="'+icon.replace(/"/g,'&quot;')+'">';
+  }
+  return icon;
+}
+function priceHTML(item){
+  if(item.single!==undefined) return '<div class="price">'+rp(item.single)+'</div>';
+  if(item.hot!==undefined || item.iced!==undefined){
+    return '<div class="price-dual"><span><span class="lbl">Hot</span>'+rp(item.hot)+'</span><span><span class="lbl">Iced</span>'+rp(item.iced)+'</span></div>';
+  }
+  return '';
+}
+function favoriteCardHTML(fav){
+  const item=fav.item;
+  const badge=fav.badge ? '<span class="new-badge">'+fav.badge+'</span>' : '';
+  return '<div class="item-card fav-card"><div class="item-media">'+mediaFor(item,'drink')+'</div>'
+    +'<div class="item-body"><div class="name">'+item.name+badge+'</div>'
+    +'<div class="fav-desc">'+(fav.desc||'')+'</div>'+priceHTML(item)+'</div></div>';
+}
+function itemCardHTML(item, kind){
+  return '<div class="item-card"><div class="item-media">'+mediaFor(item,kind)+'</div>'
+    +'<div class="item-body"><div class="name">'+item.name+'</div>'+priceHTML(item)+'</div></div>';
+}
+
+/* ================= RENDER ================= */
+function renderAll(){
+  // mood
+  const moodChipsEl=document.getElementById('moodChips');
+  const moodSuggestEl=document.getElementById('moodSuggest');
+  moodChipsEl.innerHTML=''; moodSuggestEl.textContent='';
+  MOODS.forEach((m,i)=>{
+    const chip=document.createElement('div');
+    chip.className='chip';
+    chip.textContent=(m.emoji?m.emoji+' ':'')+m.label;
+    chip.addEventListener('click',()=>{
+      document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+      chip.classList.add('active');
+      moodSuggestEl.textContent='\u2192 Coba: '+m.pick+' \u2014 '+m.note;
+    });
+    moodChipsEl.appendChild(chip);
+    if(i===0) chip.click();
+  });
+
+  // promo strip (home)
+  const promoStripEl=document.getElementById('promoStrip');
+  promoStripEl.innerHTML='';
+  PROMOS.forEach(p=>{
+    const el=document.createElement('div');
+    el.className='promo-card';
+    el.innerHTML='<span class="tag">'+p.tag+'</span><h3 class="pixel-hero">'+p.title+'</h3><p>'+p.short+'</p>';
+    el.addEventListener('click',()=>goto('promo'));
+    promoStripEl.appendChild(el);
+  });
+
+  // favorites
+  const recommendEl=document.getElementById('recommendList');
+  recommendEl.innerHTML='';
+  FAVORITES.forEach(f=> recommendEl.insertAdjacentHTML('beforeend', favoriteCardHTML(f)));
+
+  // drinks
+  const drinkSubtabsEl=document.getElementById('drinkSubtabs');
+  const drinkListEl=document.getElementById('drinkList');
+  drinkSubtabsEl.innerHTML=''; drinkListEl.innerHTML='';
+  function renderDrinkCat(key){
+    const cat=DRINK_CATS.find(c=>c.key===key);
+    drinkListEl.innerHTML=cat.items.map(i=>itemCardHTML(i,'drink')).join('');
+  }
+  DRINK_CATS.forEach((cat,i)=>{
+    const t=document.createElement('div');
+    t.className='subtab'+(i===0?' active':'');
+    t.textContent=cat.label;
+    t.addEventListener('click',()=>{
+      document.querySelectorAll('.subtab').forEach(s=>s.classList.remove('active'));
+      t.classList.add('active');
+      renderDrinkCat(cat.key);
+    });
+    drinkSubtabsEl.appendChild(t);
+  });
+  if(DRINK_CATS.length) renderDrinkCat(DRINK_CATS[0].key);
+
+  // meals
+  const mealListEl=document.getElementById('mealList');
+  mealListEl.innerHTML='';
+  MEALS.forEach(item=> mealListEl.insertAdjacentHTML('beforeend', itemCardHTML(item,'food')));
+
+  // addons
+  const addonListEl=document.getElementById('addonList');
+  addonListEl.innerHTML='';
+  ADDONS.forEach(a=>{
+    addonListEl.insertAdjacentHTML('beforeend',
+      '<div class="addon-row"><span>'+a.name+'</span><span>+ '+rp(a.price)+'</span></div>');
+  });
+
+  // promo full
+  const promoFullListEl=document.getElementById('promoFullList');
+  promoFullListEl.innerHTML='';
+  PROMOS.forEach(p=>{
+    promoFullListEl.insertAdjacentHTML('beforeend',
+      '<div class="promo-full"><span class="tag">'+p.tag+'</span><h3 class="pixel-hero">'+p.title+'</h3><p>'+p.detail+'</p><div class="period">'+p.period+'</div></div>');
+  });
+
+  // draggable strips
+  [moodChipsEl, promoStripEl, drinkSubtabsEl].forEach(makeDraggable);
+}
+
+function makeDraggable(el){
+  if(el._draggable) return; el._draggable=true;
+  let isDown=false,startX=0,startScroll=0,moved=false;
+  el.addEventListener('mousedown',(e)=>{ isDown=true;moved=false;el.classList.add('dragging');startX=e.pageX;startScroll=el.scrollLeft; });
+  window.addEventListener('mouseup',()=>{ isDown=false;el.classList.remove('dragging'); });
+  el.addEventListener('mouseleave',()=>{ if(isDown){isDown=false;el.classList.remove('dragging');} });
+  el.addEventListener('mousemove',(e)=>{ if(!isDown)return; e.preventDefault(); const dx=e.pageX-startX; if(Math.abs(dx)>4)moved=true; el.scrollLeft=startScroll-dx; });
+  el.addEventListener('click',(e)=>{ if(moved){e.stopPropagation();e.preventDefault();moved=false;} }, true);
+}
+
+function goto(viewKey){
+  document.querySelectorAll('.view').forEach(v=> v.classList.toggle('active', v.id==='view-'+viewKey));
+  document.querySelectorAll('.nav-btn').forEach(b=> b.classList.toggle('active', b.dataset.view===viewKey));
+  document.querySelector('.screen').scrollTop=0;
+}
+document.querySelectorAll('.nav-btn').forEach(b=> b.addEventListener('click',()=> goto(b.dataset.view)));
+
+/* ================= BANNER ================= */
+function setBanner(text, color){
+  let b=document.getElementById('dataBanner');
+  if(!b){
+    b=document.createElement('div');
+    b.id='dataBanner';
+    b.style.cssText='font-family:DM Sans,sans-serif;font-size:11px;line-height:1.4;text-align:center;padding:9px 12px;border-radius:12px;margin-bottom:14px;';
+    const screen=document.querySelector('.screen');
+    screen.insertBefore(b, screen.firstChild);
+  }
+  if(!text){ b.style.display='none'; return; }
+  b.style.display='block';
+  b.style.background = color==='warn' ? '#FBECC2' : '#E4F0E7';
+  b.style.color = color==='warn' ? '#8A6D1F' : '#11754D';
+  b.style.border = '1px solid ' + (color==='warn' ? '#E4C878' : 'rgba(17,117,77,0.3)');
+  b.innerHTML=text;
+}
+
+/* ================= INIT ================= */
+function gvizToObjects(resp){
+  const table=resp.table;
+  const labels=table.cols.map(c=>String(c.label||'').trim().toLowerCase());
+  return table.rows.map(r=>{
+    const o={};
+    labels.forEach((lab,i)=>{
+      const cell=r.c[i];
+      let v=(cell && cell.v!==null && cell.v!==undefined)?cell.v:'';
+      o[lab]=(typeof v==='string')?v.trim():v;
+    });
+    return o;
+  });
+}
+// Ambil data via JSONP (script tag) -> tembus batasan CORS & file lokal
+function loadSheet(name){
+  return new Promise((resolve,reject)=>{
+    const cb='__gviz_'+Math.random().toString(36).slice(2);
+    const s=document.createElement('script');
+    const to=setTimeout(()=>{cleanup();reject(new Error('timeout '+name));},15000);
+    function cleanup(){clearTimeout(to);try{delete window[cb];}catch(e){window[cb]=undefined;}s.remove();}
+    window[cb]=(resp)=>{cleanup();try{resolve(gvizToObjects(resp));}catch(e){reject(e);}};
+    s.onerror=()=>{cleanup();reject(new Error('gagal muat '+name));};
+    s.src='https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/gviz/tq?sheet='
+      +encodeURIComponent(name)+'&headers=1&tqx=responseHandler:'+cb;
+    document.body.appendChild(s);
+  });
+}
+async function init(){
+  setBanner('Memuat menu terbaru\u2026', 'ok');
+  try{
+    const [min,mak,tam,moo,pro,fav] = await Promise.all([
+      loadSheet('Minuman'), loadSheet('Makanan'), loadSheet('Tambahan'),
+      loadSheet('Mood'), loadSheet('Promo'), loadSheet('Favorit')
+    ]);
+    applyData(min,mak,tam,moo,pro,fav);
+    renderAll();
+    setBanner('', null);
+  }catch(err){
+    console.error('Gagal baca Google Sheet:', err);
+    applyFallback();
+    renderAll();
+    setBanner('\u26A0\uFE0F Menu belum tersambung ke Google Sheet \u2014 menampilkan data cadangan.<br>Cek: sheet sudah di-<b>Share \u2192 Anyone with the link \u2192 Viewer</b>, dan nama tab tidak diubah.', 'warn');
+  }
+}
+init();
+</script>
+
+</body>
+</html>
