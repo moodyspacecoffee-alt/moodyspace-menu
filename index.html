@@ -20,14 +20,17 @@
   }
   *{ box-sizing:border-box; }
   html,body{ margin:0; padding:0; }
+  html{ height: 100%; }
   body{
     background: #DCE4DA;
     font-family:'DM Sans', sans-serif;
     color: var(--ink);
-    min-height: 100vh;
+    height: var(--app-height, 100vh);
+    min-height: var(--app-height, 100vh);
     display:flex;
     justify-content:center;
     padding: 22px 10px;
+    overflow: hidden;
   }
 
   .pixel-hero{ font-family:'Press Start 2P', monospace; }
@@ -43,7 +46,7 @@
     display:flex;
     flex-direction:column;
     height: 840px;
-    max-height: 100dvh;
+    max-height: var(--app-height, 100vh);
     position:relative;
   }
 
@@ -52,7 +55,7 @@
     body{ padding:0; }
     .phone{
       max-width:100%;
-      height:100dvh;
+      height: var(--app-height, 100vh);
       border-radius:0;
       box-shadow:none;
     }
@@ -719,6 +722,13 @@
 </div>
 
 <script>
+/* Fix tinggi layar HP yang suka salah hitung (toolbar browser naik-turun) */
+function setAppHeight(){
+  document.documentElement.style.setProperty('--app-height', window.innerHeight + 'px');
+}
+setAppHeight();
+window.addEventListener('resize', setAppHeight);
+window.addEventListener('orientationchange', ()=> setTimeout(setAppHeight, 100));
 const SHEET_ID = "1E6mV7LE6AM6eGnMZiQk68zHGpiaTI9YuRPNfyFfsgXA";
 function sheetUrl(name){
   return "https://docs.google.com/spreadsheets/d/" + SHEET_ID +
